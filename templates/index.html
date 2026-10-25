@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retention Control Room</title>
+    <!-- Distinct heading typeface: 'Outfit' for headers, 'Inter' for body -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Chart.js for the dominant risk gauge -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation (Minimalistic) -->
+        <nav class="sidebar">
+            <div class="logo">
+                <span class="logo-icon">●</span>
+                <h1 class="logo-text">PULSE</h1>
+            </div>
+            <ul class="nav-links">
+                <li id="tab-overview" class="active">Overview</li>
+                <li id="tab-audience">Audience Analytics</li>
+            </ul>
+        </nav>
+
+        <!-- Main Content (Asymmetric Layout) -->
+        <main class="dashboard">
+            <header class="top-bar">
+                <h2 class="page-title">Retention Control Room</h2>
+                <div class="search-bar">
+                    <input type="text" id="customer-name-input" placeholder="Enter Customer Name (e.g. John)..." value="John">
+                    <button id="analyze-btn" class="btn-primary">Analyze Risk</button>
+                </div>
+            </header>
+
+            <!-- Overview View -->
+            <div id="view-overview" class="content-grid">
+                <!-- Large Panel: Dominant Visual Risk Gauge -->
+                <div class="panel main-panel">
+                    <div class="panel-header">
+                        <h3>Churn Probability Index</h3>
+                        <span class="badge" id="risk-badge">Ready</span>
+                    </div>
+                    <div class="gauge-container">
+                        <canvas id="riskGauge"></canvas>
+                        <div class="gauge-center-text">
+                            <span id="risk-percentage">--%</span>
+                            <span class="risk-label">Risk Level</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Narrow Side Column: Show/Movie Detail Panel Style -->
+                <div class="panel side-panel">
+                    <div class="poster-card">
+                        <div class="poster-image-placeholder" id="poster-bg" style="background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&q=80'); background-size: cover; background-position: center;">
+                            <span id="genre-badge" class="genre-badge">GENRE</span>
+                        </div>
+                        <div class="customer-details">
+                            <h3 id="c-name-display">Customer Name</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: -8px; margin-bottom: 12px;" id="c-id-display">ID</p>
+                            <div class="meta-tags">
+                                <span class="tag" id="c-plan">Plan</span>
+                                <span class="tag" id="c-region">Region</span>
+                            </div>
+                            
+                            <div class="stats-list">
+                                <div class="stat-item">
+                                    <span class="stat-label">Age</span>
+                                    <span class="stat-value" id="c-age">--</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Watch Time (hrs)</span>
+                                    <span class="stat-value" id="c-watch">--</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Monthly Fee ($)</span>
+                                    <span class="stat-value" id="c-fee">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audience View (Hidden by default) -->
+            <div id="view-audience" class="hidden">
+                <div class="panel">
+                    <h3 style="margin-bottom: 1.5rem;">Audience Analytics & EDA</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <img src="{{ url_for('static', filename='plots/1_churn_distribution.png') }}" style="width: 100%; border-radius: 8px;">
+                        <img src="{{ url_for('static', filename='plots/2_churn_by_subscription.png') }}" style="width: 100%; border-radius: 8px;">
+                        <img src="{{ url_for('static', filename='plots/3_watch_time_by_churn.png') }}" style="width: 100%; border-radius: 8px;">
+                        <img src="{{ url_for('static', filename='plots/8_roc_curve.png') }}" style="width: 100%; border-radius: 8px;">
+                    </div>
+                </div>
+            </div>
+            
+            <div id="error-message" class="error-toast hidden"></div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
