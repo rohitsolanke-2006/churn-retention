@@ -5,4 +5,5 @@ seaborn
 scipy
 scikit-learn
 flask
+flask-cors
 joblib

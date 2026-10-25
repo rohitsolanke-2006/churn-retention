@@ -3,104 +3,781 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retention Control Room</title>
-    <!-- Distinct heading typeface: 'Outfit' for headers, 'Inter' for body -->
+    <title>PULSE — OTT Audience Retention Intelligence</title>
+    <meta name="description" content="Audience Retention & Churn Intelligence Platform for OTT streaming services. Predict subscriber churn, analyze engagement, and drive retention.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Chart.js for the dominant risk gauge -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar Navigation (Minimalistic) -->
-        <nav class="sidebar">
-            <div class="logo">
-                <span class="logo-icon">●</span>
-                <h1 class="logo-text">PULSE</h1>
+    <div class="app-shell" id="app">
+        <!-- SIDEBAR -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-mark">P</div>
+                    <span class="logo-text">PULSE</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
             </div>
-            <ul class="nav-links">
-                <li id="tab-overview" class="active">Overview</li>
-                <li id="tab-audience">Audience Analytics</li>
+            <ul class="nav-menu" id="nav-menu">
+                <li class="nav-item active" data-page="overview">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                    <span>Overview</span>
+                </li>
+                <li class="nav-item" data-page="analytics">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+                    <span>Audience Analytics</span>
+                </li>
+                <li class="nav-item" data-page="prediction">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    <span>Churn Prediction</span>
+                </li>
+                <li class="nav-item" data-page="retention">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                    <span>Retention Center</span>
+                </li>
+                <li class="nav-item" data-page="model">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                    <span>Model Insights</span>
+                </li>
+                <li class="nav-item" data-page="reports">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    <span>Reports & Exports</span>
+                </li>
+                <li class="nav-item" data-page="settings">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span>Settings</span>
+                </li>
             </ul>
+            <div class="sidebar-footer">
+                <div class="api-status" id="api-status">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Checking...</span>
+                </div>
+            </div>
         </nav>
 
-        <!-- Main Content (Asymmetric Layout) -->
-        <main class="dashboard">
+        <!-- MOBILE OVERLAY -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <!-- TOP BAR -->
             <header class="top-bar">
-                <h2 class="page-title">Retention Control Room</h2>
-                <div class="search-bar">
-                    <input type="text" id="customer-name-input" placeholder="Enter Customer Name (e.g. John)..." value="John">
-                    <button id="analyze-btn" class="btn-primary">Analyze Risk</button>
+                <div class="top-bar-left">
+                    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open menu">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                    </button>
+                    <div class="page-info">
+                        <h1 class="page-title" id="page-title">Executive Overview</h1>
+                        <p class="page-subtitle" id="page-subtitle">Subscriber base health and churn risk summary</p>
+                    </div>
+                </div>
+                <div class="top-bar-right">
+                    <div class="system-badge">
+                        <span class="live-dot"></span>
+                        <span class="badge-text">5,000 OTT Subscribers Monitored</span>
+                    </div>
+                    <button class="btn-icon" id="refresh-btn" title="Refresh platform data">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                    </button>
                 </div>
             </header>
 
-            <!-- Overview View -->
-            <div id="view-overview" class="content-grid">
-                <!-- Large Panel: Dominant Visual Risk Gauge -->
-                <div class="panel main-panel">
-                    <div class="panel-header">
-                        <h3>Churn Probability Index</h3>
-                        <span class="badge" id="risk-badge">Ready</span>
+            <!-- PAGE CONTAINER -->
+            <div class="page-container" id="page-container">
+
+                <!-- ==================== PAGE: OVERVIEW ==================== -->
+                <div class="page active" id="page-overview">
+                    <!-- Top KPIs -->
+                    <div class="kpi-grid" id="overview-kpis">
+                        <!-- Filled by JS -->
                     </div>
-                    <div class="gauge-container">
-                        <canvas id="riskGauge"></canvas>
-                        <div class="gauge-center-text">
-                            <span id="risk-percentage">--%</span>
-                            <span class="risk-label">Risk Level</span>
+
+                    <!-- Row 1: High Level Distributions with Explanations -->
+                    <div class="section-grid-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>Churn Distribution</h3>
+                                    <p class="chart-desc">Observed historical split between active and cancelled subscribers.</p>
+                                </div>
+                                <span class="card-badge">Ground Truth</span>
+                            </div>
+                            <div class="chart-container chart-sm">
+                                <canvas id="chart-churn-dist"></canvas>
+                            </div>
+                            <div class="chart-caption">
+                                <strong>Takeaway:</strong> Dataset baseline reflects a 50.3% churn rate (2,515 churned vs 2,485 active).
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>Risk Distribution</h3>
+                                    <p class="chart-desc">AI classification of subscribers into predictive risk bands.</p>
+                                </div>
+                                <span class="card-badge">Random Forest</span>
+                            </div>
+                            <div class="chart-container chart-sm">
+                                <canvas id="chart-risk-dist"></canvas>
+                            </div>
+                            <div class="chart-caption">
+                                <strong>Takeaway:</strong> High Risk (>70% prob) subscribers require immediate retention outreach before their next billing cycle.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Behavioral Drivers with Explanations -->
+                    <div class="section-grid-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>Churn Rate by Subscription Tier</h3>
+                                    <p class="chart-desc">Cancellation percentage across Basic ($8.99), Standard ($13.99), and Premium ($17.99).</p>
+                                </div>
+                                <span class="card-badge">Tier Comparison</span>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chart-churn-sub"></canvas>
+                            </div>
+                            <div class="chart-caption">
+                                <strong>Takeaway:</strong> Identifies price sensitivity across plans to guide targeted tier downgrades vs cancellations.
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>Streaming Hours by Churn Status</h3>
+                                    <p class="chart-desc">Comparison of mean monthly watch time between retained and churned subscribers.</p>
+                                </div>
+                                <span class="card-badge">Engagement Gap</span>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chart-watch-churn"></canvas>
+                            </div>
+                            <div class="chart-caption">
+                                <strong>Takeaway:</strong> Dropping watch hours is the earliest leading indicator of subscriber dissatisfaction.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Priority Queue -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h3>Priority Retention Queue</h3>
+                                <p class="chart-desc">Top 10 highest priority subscribers ranked by AI churn probability and plan value.</p>
+                            </div>
+                            <span class="card-badge">Action Required</span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table" id="priority-table">
+                                <thead>
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th>Subscription</th>
+                                        <th>Churn Prob.</th>
+                                        <th>Risk</th>
+                                        <th>Engagement</th>
+                                        <th>Priority</th>
+                                        <th>Suggested Intervention</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="priority-table-body">
+                                    <!-- Filled by JS -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- Narrow Side Column: Show/Movie Detail Panel Style -->
-                <div class="panel side-panel">
-                    <div class="poster-card">
-                        <div class="poster-image-placeholder" id="poster-bg" style="background-image: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&q=80'); background-size: cover; background-position: center;">
-                            <span id="genre-badge" class="genre-badge">GENRE</span>
-                        </div>
-                        <div class="customer-details">
-                            <h3 id="c-name-display">Customer Name</h3>
-                            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: -8px; margin-bottom: 12px;" id="c-id-display">ID</p>
-                            <div class="meta-tags">
-                                <span class="tag" id="c-plan">Plan</span>
-                                <span class="tag" id="c-region">Region</span>
-                            </div>
-                            
-                            <div class="stats-list">
-                                <div class="stat-item">
-                                    <span class="stat-label">Age</span>
-                                    <span class="stat-value" id="c-age">--</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-label">Watch Time (hrs)</span>
-                                    <span class="stat-value" id="c-watch">--</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-label">Monthly Fee ($)</span>
-                                    <span class="stat-value" id="c-fee">--</span>
-                                </div>
-                            </div>
-                        </div>
+                <!-- ==================== PAGE: AUDIENCE ANALYTICS ==================== -->
+                <div class="page" id="page-analytics">
+                    <div class="tabs" id="analytics-tabs">
+                        <button class="tab active" data-tab="watch">Watch Time</button>
+                        <button class="tab" data-tab="engagement">Engagement</button>
+                        <button class="tab" data-tab="genre">Content & Genres</button>
+                        <button class="tab" data-tab="subscription">Subscriptions & Plans</button>
+                        <button class="tab" data-tab="demographics">Demographics</button>
                     </div>
-                </div>
-            </div>
 
-            <!-- Audience View (Hidden by default) -->
-            <div id="view-audience" class="hidden">
-                <div class="panel">
-                    <h3 style="margin-bottom: 1.5rem;">Audience Analytics & EDA</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                        <img src="{{ url_for('static', filename='plots/1_churn_distribution.png') }}" style="width: 100%; border-radius: 8px;">
-                        <img src="{{ url_for('static', filename='plots/2_churn_by_subscription.png') }}" style="width: 100%; border-radius: 8px;">
-                        <img src="{{ url_for('static', filename='plots/3_watch_time_by_churn.png') }}" style="width: 100%; border-radius: 8px;">
-                        <img src="{{ url_for('static', filename='plots/8_roc_curve.png') }}" style="width: 100%; border-radius: 8px;">
+                    <!-- Watch Time Tab -->
+                    <div class="tab-content active" id="tab-watch">
+                        <div class="kpi-grid kpi-grid-4" id="watch-kpis"></div>
+                        <div class="section-grid-2">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div>
+                                        <h3>Monthly Watch Hours Distribution</h3>
+                                        <p class="chart-desc">Subscriber count across total monthly streaming hour intervals.</p>
+                                    </div>
+                                </div>
+                                <div class="chart-container"><canvas id="chart-watch-dist"></canvas></div>
+                                <div class="chart-caption"><strong>Insight:</strong> Highlights the core viewing cohorts and identifies light consumers prone to churn.</div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <div>
+                                        <h3>Average Watch Hours by Plan</h3>
+                                        <p class="chart-desc">Mean monthly watch time across Basic, Standard, and Premium.</p>
+                                    </div>
+                                </div>
+                                <div class="chart-container"><canvas id="chart-watch-sub"></canvas></div>
+                                <div class="chart-caption"><strong>Insight:</strong> Evaluates if higher-paying tiers are achieving higher platform consumption.</div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>Regional Watch Hours</h3>
+                                    <p class="chart-desc">Average monthly viewing hours across geographic streaming territories.</p>
+                                </div>
+                            </div>
+                            <div class="chart-container"><canvas id="chart-watch-region"></canvas></div>
+                        </div>
+                    </div>
+
+                    <!-- Engagement Tab -->
+                    <div class="tab-content" id="tab-engagement">
+                        <div class="kpi-grid kpi-grid-4" id="engagement-kpis"></div>
+                        <div class="section-grid-2">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div>
+                                        <h3>Engagement Score Distribution</h3>
+                                        <p class="chart-desc">Multi-factor engagement index (0-100) combining watch hours, login recency, and profile activity.</p>
+                                    </div>
+                                </div>
+                                <div class="chart-container chart-sm"><canvas id="chart-eng-dist"></canvas></div>
+                                <div class="chart-caption"><strong>Insight:</strong> Low engagement accounts represent the primary target for re-engagement newsletters.</div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <div>
+                                        <h3>Engagement by Subscription Tier</h3>
+                                        <p class="chart-desc">Mean engagement score achieved across each subscription plan.</p>
+                                    </div>
+                                </div>
+                                <div class="chart-container"><canvas id="chart-eng-sub"></canvas></div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>Days Since Last Login by Churn Status</h3>
+                                    <p class="chart-desc">Mean inactivity days between retained vs. churned users before cancellation.</p>
+                                </div>
+                            </div>
+                            <div class="chart-container"><canvas id="chart-login-churn"></canvas></div>
+                            <div class="chart-caption"><strong>Critical Insight:</strong> Churned subscribers exhibit a mean inactivity gap of ~40+ days, compared to active users who stream regularly.</div>
+                        </div>
+                    </div>
+
+                    <!-- Genre Tab -->
+                    <div class="tab-content" id="tab-genre">
+                        <div class="section-grid-2">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div>
+                                        <h3>Content Affinity (Genre Popularity)</h3>
+                                        <p class="chart-desc">Proportion of subscribers who designate each category as their preferred genre.</p>
+                                    </div>
+                                </div>
+                                <div class="chart-container chart-sm"><canvas id="chart-genre-dist"></canvas></div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <div>
+                                        <h3>Churn Rate by Preferred Genre</h3>
+                                        <p class="chart-desc">Percentage of subscribers churning within each genre preference group.</p>
+                                    </div>
+                                </div>
+                                <div class="chart-container"><canvas id="chart-genre-churn"></canvas></div>
+                                <div class="chart-caption"><strong>Content Insight:</strong> High-churn genres highlight content library gaps where fresh titles or renewals are urgently required.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subscription Tab -->
+                    <div class="tab-content" id="tab-subscription">
+                        <div class="section-grid-2">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div>
+                                        <h3>Churn Rate by Payment Method</h3>
+                                        <p class="chart-desc">Cancellation rates across Credit Card, Debit Card, PayPal, Crypto, and Bank Transfer.</p>
+                                    </div>
+                                </div>
+                                <div class="chart-container"><canvas id="chart-payment-churn"></canvas></div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <div>
+                                        <h3>Churn Rate by Primary Device</h3>
+                                        <p class="chart-desc">Churn proportion across TV, Mobile, Desktop, Tablet, and Console.</p>
+                                    </div>
+                                </div>
+                                <div class="chart-container"><canvas id="chart-device-churn"></canvas></div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>Number of Profiles vs. Churn Rate</h3>
+                                    <p class="chart-desc">Multi-profile households vs single-user accounts.</p>
+                                </div>
+                            </div>
+                            <div class="chart-container"><canvas id="chart-profile-churn"></canvas></div>
+                            <div class="chart-caption"><strong>Household Retention:</strong> Multi-profile accounts show greater stickiness as family sharing increases switching costs.</div>
+                        </div>
+                    </div>
+
+                    <!-- Demographics Tab -->
+                    <div class="tab-content" id="tab-demographics">
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>Churn Rate by Age Group</h3>
+                                    <p class="chart-desc">Generational retention stability across 18-24, 25-34, 35-44, 45-54, 55-64, and 65+.</p>
+                                </div>
+                            </div>
+                            <div class="chart-container"><canvas id="chart-age-churn"></canvas></div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>Churn Rate by Region</h3>
+                                    <p class="chart-desc">Geographic churn variation across global viewing territories.</p>
+                                </div>
+                            </div>
+                            <div class="chart-container"><canvas id="chart-region-churn"></canvas></div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <div id="error-message" class="error-toast hidden"></div>
+
+                <!-- ==================== PAGE: CHURN PREDICTION ==================== -->
+                <div class="page" id="page-prediction">
+                    <div class="prediction-search-section">
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>Subscriber Risk Diagnostic</h3>
+                                    <p class="text-muted">Enter a subscriber name or UUID to run machine learning churn prediction and generate personalized retention strategies.</p>
+                                </div>
+                            </div>
+                            <div class="search-group">
+                                <input type="text" id="predict-search" placeholder="Type subscriber name (e.g. Rohit Lewis) or paste UUID..." class="input-lg">
+                                <button class="btn btn-primary" id="predict-btn">Analyze Risk</button>
+                                <button class="btn btn-ghost" id="predict-clear">Clear</button>
+                            </div>
+                            <div id="predict-suggestions" class="search-suggestions"></div>
+                            <div id="predict-error" class="alert alert-danger hidden"></div>
+                        </div>
+                    </div>
+
+                    <div id="prediction-results" class="hidden">
+                        <!-- Hero Gauge & Profile -->
+                        <div class="section-grid-3-1">
+                            <div class="card prediction-hero">
+                                <div class="card-header">
+                                    <h3>Predicted Churn Risk</h3>
+                                    <span class="risk-badge" id="pred-risk-badge">—</span>
+                                </div>
+                                <div class="gauge-wrapper">
+                                    <canvas id="pred-gauge"></canvas>
+                                    <div class="gauge-value">
+                                        <span id="pred-prob-value">—</span>
+                                        <span class="gauge-label">Churn Risk</span>
+                                    </div>
+                                </div>
+                                <div class="retention-bar">
+                                    <span class="text-muted">Retention Likelihood:</span>
+                                    <span class="retention-value" id="pred-retention">—</span>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Subscriber Metadata</h3>
+                                </div>
+                                <div class="profile-info" id="pred-profile"></div>
+                            </div>
+                        </div>
+
+                        <!-- Key Metrics -->
+                        <div class="kpi-grid kpi-grid-5" id="pred-metrics"></div>
+
+                        <!-- Interpretation & Recommendations -->
+                        <div class="section-grid-2">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Explainable AI Risk Factors</h3>
+                                </div>
+                                <p id="pred-explanation" class="explanation-text"></p>
+                                <div id="pred-comparisons" class="comparisons-grid"></div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Retention Campaign Recommendations</h3>
+                                </div>
+                                <div id="pred-recommendations" class="recommendations-list"></div>
+                            </div>
+                        </div>
+
+                        <!-- Prediction History -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>Audit & Prediction History</h3>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr><th>Timestamp</th><th>Probability</th><th>Risk Category</th><th>Engine</th></tr>
+                                    </thead>
+                                    <tbody id="pred-history-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== PAGE: UNIFIED RETENTION CENTER ==================== -->
+                <div class="page" id="page-retention">
+                    <!-- Segment Summary KPIs -->
+                    <div class="kpi-grid kpi-grid-3" id="retention-segment-kpis"></div>
+
+                    <!-- Retention Workspace Tabs -->
+                    <div class="tabs" id="retention-tabs">
+                        <button class="tab active" data-tab="ret-directory">Subscriber Directory & Filters</button>
+                        <button class="tab" data-tab="ret-actions">Retention Action Tracker</button>
+                    </div>
+
+                    <!-- TAB 1: Unified Subscriber Directory with Filters -->
+                    <div class="tab-content active" id="tab-ret-directory">
+                        <div class="card filter-bar">
+                            <div class="filter-row">
+                                <div class="filter-group" style="min-width: 220px;">
+                                    <label>Search Subscriber</label>
+                                    <input type="text" id="ret-dir-search" placeholder="Search by name or UUID...">
+                                </div>
+                                <div class="filter-group">
+                                    <label>Subscription</label>
+                                    <select id="ret-dir-sub">
+                                        <option value="">All Tiers</option>
+                                        <option value="Basic">Basic ($8.99)</option>
+                                        <option value="Standard">Standard ($13.99)</option>
+                                        <option value="Premium">Premium ($17.99)</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label>Churn Status</label>
+                                    <select id="ret-dir-churn">
+                                        <option value="">All Statuses</option>
+                                        <option value="0">Active Subscribers</option>
+                                        <option value="1">Churned Subscribers</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label>Risk Level</label>
+                                    <select id="ret-dir-risk">
+                                        <option value="">All Risk Tiers</option>
+                                        <option value="High">High Risk (>70%)</option>
+                                        <option value="Medium">Medium Risk (40-70%)</option>
+                                        <option value="Low">Low Risk (<40%)</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label>Engagement</label>
+                                    <select id="ret-dir-engagement">
+                                        <option value="">All Engagement</option>
+                                        <option value="High">High</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Low">Low</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label>Sort By</label>
+                                    <select id="ret-dir-sort">
+                                        <option value="churn_probability">Churn Probability</option>
+                                        <option value="priority_score">Priority Score</option>
+                                        <option value="watch_hours">Watch Hours</option>
+                                        <option value="monthly_fee">Monthly Fee</option>
+                                        <option value="engagement_score">Engagement Score</option>
+                                        <option value="customer_name">Name</option>
+                                    </select>
+                                </div>
+                                <div class="filter-actions">
+                                    <button class="btn btn-primary btn-sm" id="ret-dir-apply">Apply Filters</button>
+                                    <button class="btn btn-ghost btn-sm" id="ret-dir-clear">Reset</button>
+                                </div>
+                            </div>
+                            <div class="filter-status">
+                                <span id="ret-dir-count">Loading subscribers...</span>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="table-responsive">
+                                <table class="data-table" id="ret-dir-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Customer</th>
+                                            <th>Plan</th>
+                                            <th>Region</th>
+                                            <th>Watch Hours</th>
+                                            <th>Monthly Fee</th>
+                                            <th>Churn Prob.</th>
+                                            <th>Risk Tier</th>
+                                            <th>Engagement</th>
+                                            <th>Status</th>
+                                            <th style="text-align:right;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ret-dir-body"></tbody>
+                                </table>
+                            </div>
+                            <div class="pagination" id="ret-dir-pagination"></div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: Retention Action Tracker -->
+                    <div class="tab-content" id="tab-ret-actions">
+                        <div class="card filter-bar">
+                            <div class="filter-row" style="justify-content: space-between;">
+                                <div class="filter-group" style="max-width: 280px;">
+                                    <label>Filter by Action Status</label>
+                                    <select id="ret-action-status">
+                                        <option value="">All Action Statuses</option>
+                                        <option value="New">New</option>
+                                        <option value="Planned">Planned</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Completed">Completed</option>
+                                    </select>
+                                </div>
+                                <div class="filter-actions">
+                                    <button class="btn btn-primary btn-sm" id="ret-filter-actions">Filter Actions</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="table-responsive">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Target Subscriber</th>
+                                            <th>Retention Campaign</th>
+                                            <th>Workflow Status</th>
+                                            <th>Operational Notes</th>
+                                            <th>Created Date</th>
+                                            <th style="text-align:right;">Manage</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="retention-actions-body"></tbody>
+                                </table>
+                            </div>
+                            <div id="ret-actions-empty" class="empty-state hidden">
+                                <p>No retention actions recorded yet. Use the <strong>"Take Action"</strong> button in the Subscriber Directory or Churn Prediction page to schedule retention campaigns.</p>
+                            </div>
+                            <div class="pagination" id="ret-actions-pagination"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== PAGE: MODEL INSIGHTS ==================== -->
+                <div class="page" id="page-model">
+                    <div class="kpi-grid kpi-grid-5" id="model-kpis"></div>
+
+                    <div class="section-grid-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>Receiver Operating Characteristic (ROC)</h3>
+                                    <p class="chart-desc">Plots True Positive Rate vs False Positive Rate across all decision cutoffs.</p>
+                                </div>
+                                <span class="card-badge">AUC: 0.9971</span>
+                            </div>
+                            <div class="chart-container"><canvas id="chart-roc"></canvas></div>
+                            <div class="chart-caption"><strong>Interpretation:</strong> The model demonstrates near-optimal separation between churners and retained subscribers compared to the dashed baseline.</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <h3>Confusion Matrix</h3>
+                                    <p class="chart-desc">Test split evaluation (1,000 holdout subscribers).</p>
+                                </div>
+                            </div>
+                            <div class="confusion-matrix" id="confusion-matrix"></div>
+                            <div class="chart-caption">
+                                <strong>Business Cost:</strong> False Negatives (missed churners) lead to lost subscriber revenue. False Positives lead to unnecessary discount spending.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h3>Feature Importance Ranking</h3>
+                                <p class="chart-desc">Gini importance scores indicating each feature's contribution to decision trees.</p>
+                            </div>
+                            <span class="card-badge">Top Predictors</span>
+                        </div>
+                        <div class="chart-container chart-tall"><canvas id="chart-feature-imp"></canvas></div>
+                        <div class="chart-caption">
+                            <strong>Key Finding:</strong> Daily watch time (~39%), total watch hours (~21%), and last login recency (~19%) account for ~80% of total predictive power.
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header"><h3>Model Architecture & Parameters</h3></div>
+                        <div class="model-info-grid" id="model-info-grid"></div>
+                    </div>
+                </div>
+
+                <!-- ==================== PAGE: REPORTS & EXPORTS ==================== -->
+                <div class="page" id="page-reports">
+                    <div class="reports-grid">
+                        <!-- Report 1 -->
+                        <div class="card report-card">
+                            <div class="report-icon">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            </div>
+                            <h3>Subscriber Risk Directory (CSV)</h3>
+                            <p class="text-muted text-sm">
+                                <strong>What it contains:</strong> Complete records for all 5,000 subscribers, including model churn probabilities, risk levels, engagement scores, monthly fees, and watch hours.
+                            </p>
+                            <p class="text-muted text-sm">
+                                <strong>Business Purpose:</strong> Import directly into your CRM (HubSpot, Braze, Salesforce) to trigger automated win-back email workflows.
+                            </p>
+                            <div class="report-filters">
+                                <select id="report-sub-filter">
+                                    <option value="">All Subscriptions</option>
+                                    <option value="Basic">Basic Plan</option>
+                                    <option value="Standard">Standard Plan</option>
+                                    <option value="Premium">Premium Plan</option>
+                                </select>
+                                <select id="report-risk-filter">
+                                    <option value="">All Risk Tiers</option>
+                                    <option value="High">High Risk Only</option>
+                                    <option value="Medium">Medium Risk Only</option>
+                                    <option value="Low">Low Risk Only</option>
+                                </select>
+                            </div>
+                            <div style="display:flex; gap:0.5rem; width:100%;">
+                                <button class="btn btn-primary" id="export-customers" style="flex:1;">Download CSV</button>
+                                <button class="btn btn-ghost" id="preview-customers">Preview Data</button>
+                            </div>
+                        </div>
+
+                        <!-- Report 2 -->
+                        <div class="card report-card">
+                            <div class="report-icon">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
+                            </div>
+                            <h3>Retention Action Audit Trail (CSV)</h3>
+                            <p class="text-muted text-sm">
+                                <strong>What it contains:</strong> All scheduled and completed retention initiatives stored in the database, including action type, subscriber ID, staff notes, and status.
+                            </p>
+                            <p class="text-muted text-sm">
+                                <strong>Business Purpose:</strong> Weekly operational review to audit team intervention volume, follow-up SLAs, and campaign efficacy.
+                            </p>
+                            <div style="display:flex; gap:0.5rem; width:100%; margin-top: auto;">
+                                <button class="btn btn-primary" id="export-retention" style="flex:1;">Download CSV</button>
+                                <button class="btn btn-ghost" id="preview-retention">Preview Data</button>
+                            </div>
+                        </div>
+
+                        <!-- Report 3 -->
+                        <div class="card report-card">
+                            <div class="report-icon">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                            </div>
+                            <h3>Model Governance & Evaluation (CSV)</h3>
+                            <p class="text-muted text-sm">
+                                <strong>What it contains:</strong> Formal model evaluation scores (Accuracy, Precision, Recall, F1, ROC-AUC), confusion matrix counts, and Gini feature rankings.
+                            </p>
+                            <p class="text-muted text-sm">
+                                <strong>Business Purpose:</strong> Machine Learning governance documentation and stakeholder validation reporting.
+                            </p>
+                            <div style="display:flex; gap:0.5rem; width:100%; margin-top: auto;">
+                                <button class="btn btn-primary" id="export-model" style="flex:1;">Download CSV</button>
+                                <button class="btn btn-ghost" id="preview-model">Preview Data</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== PAGE: SETTINGS ==================== -->
+                <div class="page" id="page-settings">
+                    <div class="section-grid-2">
+                        <div class="card">
+                            <div class="card-header"><h3>Dataset Metadata</h3></div>
+                            <div id="settings-dataset" class="settings-info"></div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header"><h3>Machine Learning Engine</h3></div>
+                            <div id="settings-model" class="settings-info"></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h3>Custom Churn Risk Thresholds</h3>
+                                <p class="text-muted text-sm">Adjust organizational thresholds for categorizing subscribers into risk tiers.</p>
+                            </div>
+                        </div>
+                        <div class="threshold-config">
+                            <div class="threshold-group">
+                                <label>Low Risk Maximum Cutoff</label>
+                                <p class="text-muted text-sm">Subscribers below this probability are marked Low Risk</p>
+                                <input type="number" id="threshold-low" step="0.05" min="0.05" max="0.95" class="input-sm">
+                            </div>
+                            <div class="threshold-group">
+                                <label>Medium Risk Maximum Cutoff</label>
+                                <p class="text-muted text-sm">Subscribers below this cutoff are Medium Risk; above are High Risk</p>
+                                <input type="number" id="threshold-medium" step="0.05" min="0.1" max="0.99" class="input-sm">
+                            </div>
+                            <div class="threshold-preview" id="threshold-preview"></div>
+                            <button class="btn btn-primary" id="save-thresholds">Save Thresholds</button>
+                            <div id="threshold-feedback" class="hidden"></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h3>Service Health & API Status</h3></div>
+                        <div id="settings-api" class="settings-info"></div>
+                    </div>
+                </div>
+
+            </div><!-- /page-container -->
         </main>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay hidden" id="modal-overlay">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Action</h3>
+                <button class="btn-icon modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+            <div class="modal-footer" id="modal-footer"></div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- LOADING OVERLAY -->
+    <div class="loading-overlay hidden" id="loading-overlay">
+        <div class="spinner"></div>
     </div>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
